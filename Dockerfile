@@ -1,12 +1,12 @@
 FROM golang:1.20.5-alpine
 LABEL authors="Lasse @ Timebeat.app"
-WORKDIR /app
-COPY src/go.mod ./src/
-COPY src/http_server ./src/
-COPY src/syslog_client ./src/
-COPY src/*.go ./src/
-WORKDIR /app/src
-ENV GOPATH=/app/src
+WORKDIR /go/src/github.com/timebeat-app/syslogrelayd
+COPY go.mod ./
+COPY http_server ./http_server/
+COPY syslog_client ./syslog_client/
+COPY *.go ./
+RUN go mod download
+RUN go mod verify
 RUN go build -o /syslogrelayd
 EXPOSE 8080
 ENTRYPOINT [ "/syslogrelayd" ]

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"syslogrelayd/http_server"
-	"syslogrelayd/syslog_client"
+	"github.com/timebeat-app/syslogrelayd/http_server"
+	"github.com/timebeat-app/syslogrelayd/syslog_client"
 )
 
 type AppController struct {
