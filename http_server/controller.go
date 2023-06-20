@@ -2,32 +2,36 @@ package http_server
 
 import (
 	"fmt"
+	"github.com/timebeat-app/syslogrelayd/syslog_client"
 	"log"
 	"net/http"
 )
 
 type Controller struct {
-	done chan struct{}
+	done             chan struct{}
+	syslogController *syslog_client.Controller
 }
 
-func NewHttpServer(done chan struct{}) *Controller {
+func NewHttpServer(done chan struct{}, syslogController *syslog_client.Controller) *Controller {
 
 	controller := &Controller{
-		done: done,
+		done:             done,
+		syslogController: syslogController,
 	}
 	return controller
 }
 
 func (controller *Controller) Run() {
 
-	http.HandleFunc("/", handleWebhook)
+	http.HandleFunc("/", controller.handleWebhook)
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatal(err)
 	}
 
 }
 
-func handleWebhook(w http.ResponseWriter, r *http.Request) {
+func (controller *Controller) handleWebhook(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Fprintf(w, "You are on the home page")
+	fmt.Fprintf(w, "Alert submitted")
+	controller.syslogController.Log()
 }

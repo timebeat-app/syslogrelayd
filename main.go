@@ -1,7 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func main() {
-	fmt.Println("Hello, World!")
+	fmt.Println("Starting syslogrelayd")
+	appController := NewAppController()
+	appController.Run()
 }
