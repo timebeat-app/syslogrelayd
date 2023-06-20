@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/timebeat-app/syslogrelayd/http_server"
 	"github.com/timebeat-app/syslogrelayd/syslog_client"
-	"net"
 )
 
 type AppController struct {
@@ -15,15 +14,11 @@ type AppController struct {
 func NewAppController() *AppController {
 
 	done := make(chan struct{})
-
-	syslogHost := &net.UDPAddr{
-		IP:   net.ParseIP("10.101.101.251"),
-		Port: 514,
-	}
+	parseConfig()
 
 	appController := &AppController{
 		done:                   done,
-		syslogClientController: syslog_client.NewSyslogClient(done, syslogHost),
+		syslogClientController: syslog_client.NewSyslogClient(done, &appConfig.syslogServer),
 	}
 	appController.httpServerController = http_server.NewHttpServer(done, appController.syslogClientController)
 

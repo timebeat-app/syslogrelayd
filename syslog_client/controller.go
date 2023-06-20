@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"log/syslog"
-	"net"
 )
 
 type Controller struct {
@@ -12,17 +11,18 @@ type Controller struct {
 	sysLogger *syslog.Writer
 }
 
-func NewSyslogClient(done chan struct{}, remoteSyslogHost *net.UDPAddr) *Controller {
+func NewSyslogClient(done chan struct{}, syslogServerConfig *SyslogServerConfig) *Controller {
 
 	controller := &Controller{
 		done: done,
 	}
 
-	sysLogger, err := syslog.Dial(remoteSyslogHost.Network(),
-		remoteSyslogHost.AddrPort().String(),
-		syslog.LOG_ALERT, "Timebeat")
+	sysLogger, err := syslog.Dial(syslogServerConfig.SyslogServer.Network(),
+		syslogServerConfig.SyslogServer.AddrPort().String(),
+		syslog.Priority(syslogServerConfig.SyslogAlertLevel),
+		syslogServerConfig.SyslogTag)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Unable to connect to syslog server: %s\n", err)
 	}
 
 	controller.sysLogger = sysLogger
