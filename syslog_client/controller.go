@@ -29,14 +29,9 @@ func NewSyslogClient(done chan struct{}, syslogServerConfig *SyslogServerConfig)
 	return controller
 }
 
-func (controller *Controller) Log() {
+func (controller *Controller) Log(body []byte) {
 
-	if _, err := fmt.Fprintf(controller.sysLogger, "This is a daemon alert with Timebeat tag."); err != nil {
+	if _, err := fmt.Fprintf(controller.sysLogger, string(body)); err != nil {
 		fmt.Printf("Syslog error: %s\n", err.Error())
 	}
-
-	if err := controller.sysLogger.Emerg("And this is a daemon emergency with Timebeat tag."); err != nil {
-		fmt.Printf("Syslog error: %s\n", err.Error())
-	}
-
 }

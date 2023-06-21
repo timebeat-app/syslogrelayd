@@ -20,7 +20,7 @@ func NewAppController() *AppController {
 		done:                   done,
 		syslogClientController: syslog_client.NewSyslogClient(done, &appConfig.syslogServer),
 	}
-	appController.httpServerController = http_server.NewHttpServer(done, appController.syslogClientController)
+	appController.httpServerController = http_server.NewHttpServer(done, &appConfig.httpServer, appController.syslogClientController)
 
 	return appController
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/timebeat-app/syslogrelayd/http_server"
 	"github.com/timebeat-app/syslogrelayd/syslog_client"
 	"log"
 	"net"
@@ -31,24 +32,49 @@ var appConfig AppConfig
 
 type AppConfig struct {
 	syslogServer syslog_client.SyslogServerConfig
+	httpServer   http_server.HttpServerConfig
 }
 
 /*
- *
- * SYSLOGRELAYD_SYSLOG_HOST
- * SYSLOGRELAYD_SYSLOG_PORT
- *
+ * Configurable via environment variables :
+ * SYSLOGRELAYD_SYSLOG_HOST 		// Mandatory
+ * SYSLOGRELAYD_SYSLOG_PORT 		// Default: 514
+ * SYSLOGRELAYD_SYSLOG_ALERT_LEVEL	// Default: alert (1)
+ * SYSLOGRELAYD_SYSLOG_TAG 			// Default: Timebeat
+ * SYSLOGRELAYD_HTTP_PORT 			// Default: 8080
+ * SYSLOGRELAYD_HTTP_URL_PATH 		// Default: /
  */
 
 func parseConfig() {
 	parseSyslogUDPAddr()
 	parseSyslogAlertLevel()
 	parseSyslogTag()
+	parseHTTPPort()
+	parseHTTPURLPath()
+}
+
+func parseHTTPURLPath() {
+	httpURLPathEnv := os.Getenv("SYSLOGRELAYD_HTTP_URL_PATH")
+	if httpURLPathEnv == "" {
+		httpURLPathEnv = "/"
+	}
+	appConfig.httpServer.HTTPURLPath = httpURLPathEnv
+}
+
+func parseHTTPPort() {
+
+	// Port
+	httpPort := 8080
+	httpPortEnv := os.Getenv("SYSLOGRELAYD_HTTP_PORT")
+	if convertedPort, err := strconv.ParseInt(httpPortEnv, 10, 16); err == nil {
+		httpPort = int(convertedPort)
+	}
+	appConfig.httpServer.HTTPServerPort = httpPort
 }
 
 func parseSyslogTag() {
 
-	tag := os.Getenv("SYSLOGRELAYD_SYSLOG_HOST")
+	tag := os.Getenv("SYSLOGRELAYD_SYSLOG_TAG")
 	if tag == "" {
 		tag = "Timebeat"
 	}
