@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: syslogrelayd
+  labels:
+    component: syslogrelayd
+  namespace: yournamespace
+spec:
+  serviceName: syslogrelayd
+  replicas: 1
+  selector:
+    matchLabels:
+      component: syslogrelayd
+  template:
+    metadata:
+      labels:
+        component: syslogrelayd
+    spec:
+      containers:
+        - name: syslogrelayd
+          image: ghcr.io/timebeat-app/syslogrelayd:latest
+          imagePullPolicy: Always
+          env:
+            # Mandatory config
+            - name: SYSLOGRELAYD_SYSLOG_HOST
+              value: "10.128.0.123" # A hostname would also do
+
+            # Optional config (default values indicated)
+            - name: SYSLOGRELAYD_SYSLOG_PORT
+              value: "514"
+            - name: SYSLOGRELAYD_SYSLOG_ALERT_LEVEL # Options: emergency, alert, critical, error, warning,
+              value: "alert"                        #          notification, informational, debugging
+            - name: SYSLOGRELAYD_SYSLOG_TAG
+              value: "Timebeat"
+            - name: SYSLOGRELAYD_HTTP_PORT
+              value: "8080"
+            - name: SYSLOGRELAYD_HTTP_URL_PATH
+              value: "/"
+          ports:
+            - containerPort: 8080
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /health  # Accepts readiness probe on /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
