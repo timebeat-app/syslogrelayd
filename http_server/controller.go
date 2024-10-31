@@ -72,7 +72,7 @@ func formatSyslogMessage(alert Alert) string {
 		msgbuilder.WriteString(fmt.Sprintf("ptp peer id: %s, ", strings.ToLower(peerId)))
 	}
 
-	if alertName, ok := alert.Labels["alertName"]; ok {
+	if alertName, ok := alert.Labels["alertname"]; ok {
 
 		msgbuilder.WriteString(fmt.Sprintf("alert: %s, ", strings.ToLower(alertName)))
 	}
