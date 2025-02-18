@@ -8,7 +8,7 @@ import (
 type AppController struct {
 	done                   chan struct{}
 	httpServerController   *http_server.Controller
-	syslogClientController *syslog_client.Controller
+	syslogClientController *syslog_client.Client
 }
 
 func NewAppController() *AppController {

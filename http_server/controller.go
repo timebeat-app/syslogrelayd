@@ -12,12 +12,12 @@ import (
 
 type Controller struct {
 	done             chan struct{}
-	syslogController *syslog_client.Controller
+	syslogController *syslog_client.Client
 	httpServerConfig *HttpServerConfig
 }
 
 func NewHttpServer(done chan struct{}, httpServerConfig *HttpServerConfig,
-	syslogController *syslog_client.Controller) *Controller {
+	syslogController *syslog_client.Client) *Controller {
 
 	controller := &Controller{
 		done:             done,

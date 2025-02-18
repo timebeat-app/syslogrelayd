@@ -141,14 +141,26 @@ func parseSyslogUDPAddr() {
 	}
 
 	// Port
-	syslogPort := 514
+	syslogDefaultPort := uint16(514)
+	var syslogPorts []uint16
+
 	syslogPortEnv := os.Getenv("SYSLOGRELAYD_SYSLOG_PORT")
-	if convertedPort, err := strconv.ParseInt(syslogPortEnv, 10, 16); err == nil {
-		syslogPort = int(convertedPort)
+
+	ports := strings.Split(syslogPortEnv, ",")
+
+	for _, port := range ports {
+		if convertedPort, err := strconv.ParseInt(port, 10, 16); err == nil {
+			syslogPorts = append(syslogPorts, uint16(convertedPort))
+		}
+	}
+
+	if len(syslogPorts) == 0 {
+		syslogPorts = append(syslogPorts, syslogDefaultPort)
 	}
 
 	appConfig.syslogServer.SyslogServer = &net.UDPAddr{
 		IP:   syslogIP,
-		Port: syslogPort,
+		Port: int(syslogPorts[0]),
 	}
+	appConfig.syslogServer.SyslogServerPorts = syslogPorts
 }
